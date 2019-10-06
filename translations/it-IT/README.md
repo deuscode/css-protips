@@ -20,8 +20,10 @@ Una collezione di dritte per aiutarti a migliorare le tue capacità con CSS.
 
 1. [Utilizzare un reset CSS](#use-a-css-reset)
 1. [Eredita il `box-sizing`](#inherit-box-sizing)
+1. [Usa `unset` invece di Reimposta tutte le proprietà](#use-unset-instead-of-resetting-all-properties)
 1. [Usa `:not()` per applicare/rimuovere i bordi su elementi di navigazione](#use-not-to-applyunapply-borders-on-navigation)
 1. [Aggiungi `line-height` al `body`](#add-line-height-to-body)
+1. [Imposta `:focus` per gli elementi del modulo](#imposta-focus-per-gli-elementi-del-modulo)
 1. [Centra verticalmente qualsiasi cosa](#vertically-center-anything)
 1. [Liste separate da virgola](#comma-separated-lists)
 1. [Seleziona un elemento usando gli `nth-child` negativi](#select-items-using-negative-nth-child)
@@ -39,6 +41,8 @@ Una collezione di dritte per aiutarti a migliorare le tue capacità con CSS.
 1. [Nascondi i video in riproduzione automatica che non sono silenziati](#hide-autoplay-videos-that-arent-muted)
 1. [Usa `:root` per caratteri flessibili](#use-root-for-flexible-type)
 1. [Imposta il `font-size` sugli elementi dei form per una migliore esperienza da mobile](#set-font-size-on-form-elements-for-a-better-mobile-experience)
+1. [Utilizzare gli eventi puntatore per controllare gli eventi del mouse](#utilizzare-gli-eventi-puntatore-per-controllare-gli-eventi-del-mouse)
+1. [Imposta `display: none` su Line Breaks usati come Spaziatura](#set-display-none-on-line-breaks-being-used-as-spacing)
 
 
 <div id="use-a-css-reset"></div>
@@ -48,7 +52,9 @@ Una collezione di dritte per aiutarti a migliorare le tue capacità con CSS.
 reset CSS aiutare a far rispettare lo stile coerenza tra diversi browser da zero per gli elementi stilistici. È possibile utilizzare libreria di reset CSS come [Normalize](http://necolas.github.io/normalize.css/), et al, oppure è possibile utilizzare un approccio più semplificato di ripristino.:
 
 ```css
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -75,12 +81,44 @@ html {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 ```
 
 In questo modo diventa più facile cambiare `box-sizing` in plugin o altri componenti che ne sfruttano un altro.
+
+<sup>[torna al sommario](#sommario)</sup>
+
+
+<div id="use-unset-instead-of-resetting-all-properties"></div>
+
+### Usa `unset` invece di Reimposta tutte le proprietà
+
+Quando si ripristinano le proprietà di un elemento, non è necessario reimpostare ogni singola proprietà:
+
+```css
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  padding: 0;
+}
+```
+
+Puoi specificare tutte le proprietà di un elemento usando la stenografia `all`. L'impostazione del valore su `unset` modifica le proprietà di un elemento ai valori iniziali:
+
+```css
+button {
+  all: unset;
+}
+```
+
+**Nota:** la stenografia `all` non è supportata in IE11 ed è attualmente in considerazione per il supporto in Edge. `unset` non è supportato in IE11.
 
 <sup>[torna al sommario](#sommario)</sup>
 
@@ -115,7 +153,7 @@ Invece di impostare il bordo...
 }
 ```
 
-Certo, puoi usare `.nav li + li` o anche `.nav li:first-child ~ li`, ma con `:not()` l'intento è molto chiaro e il selettore CSS definisce il bordo nel modo in cui un essere umano lo descriverebbe.
+Il selettore CSS definisce il confine nel modo in cui un essere umano lo descrive.
 
 #### [Dimostrazione](http://codepen.io/AllThingsSmitty/pen/LkymvO)
 
@@ -126,7 +164,8 @@ Certo, puoi usare `.nav li + li` o anche `.nav li:first-child ~ li`, ma con `:no
 
 ### Aggiungi `line-height` al `body`
 
-You don't need to add `line-height` to each `<p>`, `<h*>`, _et al_. separately. Instead, add it to `body`:
+Non è necessario aggiungere `line-height` a ogni `<p> `,`<h *>`, _et al_. separatamente. Invece, aggiungilo a `body`:
+
 
 ```css
 body {
@@ -141,6 +180,27 @@ In questo modo gli elementi di testo possono ereditare facilmente da `body`.
 <sup>[torna al sommario](#sommario)</sup>
 
 
+### Imposta `:focus` per gli elementi del modulo
+
+Gli utenti con tastiera a vista si affidano alla messa a fuoco per determinare dove vanno gli eventi della tastiera nella pagina. Fai attenzione agli elementi del modulo che si distinguono e coerenti rispetto all'implementazione predefinita del browser:
+
+```css
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: none;
+  outline: #000 dotted 2px;
+  outline-offset: .05em;
+}
+```
+
+#### [Dimostrazione](https://codepen.io/AllThingsSmitty/pen/ePzoOP/)
+
+<sup>[torna al sommario](#sommario)</sup>
+
+
 <div id="vertically-center-anything"></div>
 
 ### Centra verticalmente qualsiasi cosa
@@ -148,7 +208,8 @@ In questo modo gli elementi di testo possono ereditare facilmente da `body`.
 No, non è magia nera. Puoi veramente centrare gli elementi verticalmente:
 
 ```css
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -159,6 +220,17 @@ body {
   align-items: center;
   display: -webkit-flex;
   display: flex;
+}
+```
+
+...e anche con CSS Grid:
+
+```css
+body {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+  place-items: center center;
 }
 ```
 
@@ -210,7 +282,7 @@ li:nth-child(-n+3) {
 Oppure, dato che hai già imparato un po' di cose circa l'[uso di `:not()`](#use-not-to-applyunapply-borders-on-navigation), prova:
 
 ```css
-/* seleziona gli elementi da 1 a 3 e li mostra */
+/* selezionare tutti gli elementi tranne i primi 3 e visualizzarli */
 li:not(:nth-child(-n+3)) {
   display: none;
 }
@@ -240,7 +312,7 @@ SVG scala molto bene a tutti i tipi di risoluzione ed è supportata in tutti i b
 **Nota bene:** se usi bottoni con esclusivamente grafica SVG e le icone SVG non vengono caricate, questo ti aiuterà a preservare l'accessibilità:
 
 ```css
-.no-svg .icon-only:after {
+.no-svg .icon-only::after {
   content: attr(aria-label);
 }
 ```
@@ -427,7 +499,7 @@ Rendi le immagini non scaricate più piacevoli esteticamente con un po' di CSS:
 ```css
 img {
   display: block;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
   font-weight: 300;
   height: auto;
   line-height: 2;
@@ -440,13 +512,13 @@ img {
 Ora aggiungi le regole per gli pseudo elementi al fine di mostrare un messaggio e un riferimento URL dell'immagine non scaricata:
 
 ```css
-img:before {
+img::before {
   content: "Siamo spiacenti, l'immagine non è stata scaricata. :(";
   display: block;
   margin-bottom: 10px;
 }
 
-img:after {
+img::after {
   content: "(url: " attr(src) ")";
   display: block;
   font-size: 12px;
@@ -549,6 +621,37 @@ textarea {
 ```
 
 :dancer:
+
+<sup>[torna al sommario](#sommario)</sup>
+
+
+### Utilizzare gli eventi puntatore per controllare gli eventi del mouse
+
+[Eventi puntatore](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events) consentono di specificare come il mouse interagisce con l'elemento che sta toccando. Per disabilitare l'evento puntatore predefinito su un pulsante, ad esempio:
+
+```css
+.button-disabled {
+  opacity: .5;
+  pointer-events: none;
+}
+```
+
+È così semplice.
+
+<sup>[torna al sommario](#sommario)</sup>
+
+
+<div id="set-display-none-on-line-breaks-being-used-as-spacing"></div>
+
+### Imposta `display: none` su Line Breaks usati come Spaziatura
+
+Come [Harry Roberts ha sottolineato](https://twitter.com/csswizardry/status/1170835532584235008), questo può aiutare a impedire agli utenti CMS di utilizzare interruzioni di riga aggiuntive per la spaziatura:
+
+```css
+br + br {
+  display: none;
+}
+```
 
 <sup>[torna al sommario](#sommario)</sup>
 

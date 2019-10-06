@@ -25,8 +25,10 @@ CSSのプロのスキルになるようにアドバイスのリストを紹介�
 
 1. [CSSのリセットを使用します](#use-a-css-reset)
 1. [box-sizingをコンポーネントごとに変更](#inherit-box-sizing)
+1. [すべてのプロパティをリセットする代わりに `unset`を使う](#use-unset-instead-of-resetting-all-properties)
 1. [`:not()` を使用 / ボーダーを削除](#use-not-to-applyunapply-borders-on-navigation)
 1. [`body`に`line-height`を加える](#add-line-height-to-body)
+1. [フォーム要素に `：focus`を設定する](#set-focus-for-form-elements)
 1. [天地の中央に配置](#vertically-center-anything)
 1. [リストをカンマ区切りにする](#comma-separated-lists)
 1. [ネガティブな「:nth-child」を使用してアイテムを選択](#select-items-using-negative-nth-child)
@@ -44,7 +46,8 @@ CSSのプロのスキルになるようにアドバイスのリストを紹介�
 1. [動画の自動再生を隠す](#hide-autoplay-videos-that-arent-muted)
 1. [フレクシブルタイプの`:root`を使用](#use-root-for-flexible-type)
 1. [スマホ向け、フォーム要素のフォントサイズの設定](#set-font-size-on-form-elements-for-a-better-mobile-experience)
-
+1. [ポインターイベントを使用してマウスイベントを制御する](#use-pointer-events-to-control-mouse-events)
+1. [間隔として使用される改行に「display：none」を設定します](#set-display-none-on-line-breaks-being-used-as-spacing)
 
 
 <div id="use-a-css-reset"></div>
@@ -54,7 +57,9 @@ CSSのプロのスキルになるようにアドバイスのリストを紹介�
 CSSのリセットはスタイリング要素のための白紙の状態で異なるブラウザ間でスタイルの一貫性を強化するのに役立ちます。あなたは[Normalize](http://necolas.github.io/normalize.css/)、_et al._のようにCSSのリセットライブラリを使用するか、より簡略化リセットアプローチを使用することができます。
 
 ```css
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -82,13 +87,45 @@ html {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
 ```
 
 これでプラグインかその他のコンポーネントに `box-sizing` を変更しやすくなります。
+
+<sup>[目次へ戻る](#table-of-contents)</sup>
+
+
+<div id="use-unset-instead-of-resetting-all-properties"></div>
+
+### すべてのプロパティをリセットする代わりに `unset`を使う
+
+要素のプロパティをリセットするときは、個々のプロパティをリセットする必要はありません。
+
+```css
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  padding: 0;
+}
+```
+
+要素のプロパティのすべてを `all`省略形で指定することができます。 値を `unset`に設定すると、要素のプロパティが初期値に変更されます：
+
+```css
+button {
+  all: unset;
+}
+```
+
+**備考:** `all`省略形はIE11ではサポートされていません。現在Edgeでのサポートが検討されています。 `unset`はIE11ではサポートされていません。
 
 <sup>[目次へ戻る](#table-of-contents)</sup>
 
@@ -123,7 +160,7 @@ html {
 }
 ```
 
-もちろん `.nav li + li` また `.nav li:first-child ~ li`,を使用できますが `:not()` が一番わかりやすいコードになります。
+CSSセレクターは、境界線を人間が表現する方法で定義します。
 
 #### [デモ](http://codepen.io/AllThingsSmitty/pen/LkymvO)
 
@@ -147,6 +184,29 @@ body {
 <sup>[目次へ戻る](#table-of-contents)</sup>
 
 
+<div id="set-focus-for-form-elements"></div>
+
+### フォーム要素に `：focus`を設定する
+
+視認されたキーボードユーザーは、キーボードイベントがページ内のどこに移動するかを決定するためにフォーカスを当てています。 フォーム要素のフォーカスを目立たせ、ブラウザのデフォルトの実装と一貫性を持たせる：
+
+```css
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: none;
+  outline: #000 dotted 2px;
+  outline-offset: .05em;
+}
+```
+
+#### [デモ](https://codepen.io/AllThingsSmitty/pen/ePzoOP/)
+
+<sup>[目次へ戻る](#table-of-contents)</sup>
+
+
 <div id="vertically-center-anything"></div>
 
 ### 天地の中央に配置
@@ -154,7 +214,8 @@ body {
 なんでも天地の中央に配置できます！！
 
 ```css
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -165,6 +226,17 @@ body {
   align-items: center;
   display: -webkit-flex;
   display: flex;
+}
+```
+
+...CSSグリッド:
+
+```css
+body {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+  place-items: center center;
 }
 ```
 
@@ -216,7 +288,7 @@ li:nth-child(-n+3) {
 また [`:not()`](#use-not-to-applyunapply-borders-on-navigation)　を使用してこちらをのコードを書いてみてください：
 
 ```css
-/* select items 1 through 3 and display them */
+/* select all items except the first 3 and display them */
 li:not(:nth-child(-n+3)) {
   display: none;
 }
@@ -246,7 +318,7 @@ SVGは [IE9](http://caniuse.com/#search=svg)以降のすべてのブラウザで
 **備考:** ボタンがSVGだけで作られている場合、SVGがローディングされなかったらアクセシビリティのためこちらのコードを書いて見てください:
 
 ```css
-.no-svg .icon-only:after {
+.no-svg .icon-only::after {
   content: attr(aria-label);
 }
 ```
@@ -434,7 +506,7 @@ paddingに20%を使っているのは、そのボックスの高さを幅の20%�
 ```css
 img {  
   display: block;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
   font-weight: 300;
   height: auto;
   line-height: 2;
@@ -447,13 +519,13 @@ img {
 疑似要素を使い、ユーザーの役に立つ情報を加えることもできます。
 
 ```css
-img:before {  
+img::before {  
   content: "We're sorry, the image below is broken :(";
   display: block;
   margin-bottom: 10px;
 }
 
-img:after {  
+img::after {  
   content: "(url: " attr(src) ")";
   display: block;
   font-size: 12px;
@@ -560,14 +632,41 @@ textarea {
 <sup>[目次へ戻る](#table-of-contents)</sup>
 
 
+<div id="use-pointer-events-to-control-mouse-events"></div>
+
+### ポインターイベントを使用してマウスイベントを制御する
+
+[Pointer events](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events)では、マウスがタッチしている要素とどのように対話するかを指定することができます。 ボタン上のデフォルトポインタイベントを無効にするには、次のようにします。
+
+```css
+.button-disabled {
+  opacity: .5;
+  pointer-events: none;
+}
+```
+
+それは簡単です。
+
+<sup>[目次へ戻る](#table-of-contents)</sup>
+
+
+<div id="set-display-none-on-line-breaks-being-used-as-spacing"></div>
+
+### 間隔として使用される改行に `display：none` を設定します
+
+[ハリー・ロバーツが指摘したように](https://twitter.com/csswizardry/status/1170835532584235008)、これはCMSユーザーがスペースのために余分な改行を使用するのを防ぐのに役立ちます：
+
+```css
+br + br {
+  display: none;
+}
+```
+
+<sup>[目次へ戻る](#table-of-contents)</sup>
+
+
 <div id="support"></div>
 
 ## サポート
 
 現在のChrome, Firefox, Safari, Opera と EdgeのバージョンとIE11.
-
-<div id="references"></div>
-
-## 参考：
-
-[Coliss CSSの便利な小技・テクニックのまとめ -CSS Protips](http://coliss.com/articles/build-websites/operation/css/css-protips-v3.html)

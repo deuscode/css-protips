@@ -22,8 +22,10 @@
 
 1. [使用CSS复位](#使用css复位)
 1. [继承 `box-sizing`](#继承-box-sizing)
+1. [使用`unset`而不是重置所有属性](#使用unset而不是重置所有属性)
 1. [使用 `:not()` 选择器来决定表单是否显示边框](#使用-not-选择器来决定表单是否显示边框)
 1. [为 body 元素添加行高](#为-body-元素添加行高)
+1. [为表单元素设置`:focus`](#为表单元素设置focus)
 1. [垂直居中任何元素](#垂直居中任何元素)
 1. [逗号分隔的列表](#逗号分隔列表)
 1. [使用负的 `nth-child` 来选择元素](#使用负的-nth-child-来选择元素)
@@ -36,11 +38,13 @@
 1. [给 “默认” 链接定义样式](#给-默认-链接定义样式)
 1. [一致的垂直节奏](#一致垂直节奏)
 1. [内在比例盒](#固定比例盒子)
-1. [为破碎图象定义样式](#为破碎图象定义样式)
+1. [为图裂定义样式](#为图裂定义样式)
 1. [用 rem 来调整全局大小；用 em 来调整局部大小](#用-rem-来调整全局大小用-em-来调整局部大小)
 1. [隐藏没有静音、自动播放的影片](#隐藏没有静音自动播放的影片)
 1. [使用选择器 `:root` 来控制字体弹性](#使用选择器root来控制字体弹性)
 1. [为更好的移动体验，为表单元素设置字体大小](#为更好的移动体验为表单元素设置字体大小)
+1. [使用指针事件來控制鼠标事件](#使用指针事件來控制鼠标事件)
+1. [在用作间距的换行符上设置`display-none`](#在用作间距的换行符上设置display-none)
 
 
 ### 使用CSS复位
@@ -48,7 +52,9 @@
 CSS复位可以在不同的浏览器上保持一致的样式风格。您可以使用CSS reset 库[Normalize](http://necolas.github.io/normalize.css/)等，也可以使用一个更简化的复位方法：
 
 ```css
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -73,12 +79,42 @@ html {
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 ```
 
 如此在插件或其它组件里改变 `box-sizing` 变得简单。
+
+<sup>[回目录](#目录)</sup>
+
+
+### 使用`unset`而不是重置所有属性
+
+重置元素的属性时，不需要重置每个单独的属性：
+
+```css
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+  padding: 0;
+}
+```
+
+你可以用`all`简写來指定所有元素的属性。 将该值设置为`unset`会将元素的属性更改为其初始值：
+
+```css
+button {
+  all: unset;
+}
+```
+
+**注意：** 所有速记在IE11中不被支持，目前正在考虑Edge的支持。 IE11不支持`unset`。
 
 <sup>[回目录](#目录)</sup>
 
@@ -111,7 +147,7 @@ html {
 }
 ```
 
-当然，你也可以使用 `.nav li + li` 或者 `.nav li:first-child ~ li` ，但是 `:not()` 更加清晰，具有可读性。
+CSS选择器以人类描述它的方式定义边界。
 
 #### [演示](http://codepen.io/AllThingsSmitty/pen/LkymvO)
 
@@ -135,12 +171,34 @@ body {
 <sup>[回目录](#目录)</sup>
 
 
+### 为表单元素设置`:focus`
+
+有視力的键盘用戶依靠焦點來確定键盘事件在頁面中的位置。 使表单元素的焦點脫穎而出，然后与浏览器的默认实现保持一致：
+
+```css
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  box-shadow: none;
+  outline: #000 dotted 2px;
+  outline-offset: .05em;
+}
+```
+
+#### [演示](https://codepen.io/AllThingsSmitty/pen/ePzoOP/)
+
+<sup>[回目录](#目录)</sup>
+
+
 ### 垂直居中任何元素
 
 不！这绝不是黑魔法，真的可以垂直居中任何元素：
 
 ```css
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
 }
@@ -151,6 +209,17 @@ body {
   align-items: center;
   display: -webkit-flex;
   display: flex;
+}
+```
+
+...還有CSS Grid:
+
+```css
+body {
+  display: grid;
+  height: 100vh;
+  margin: 0;
+  place-items: center center;
 }
 ```
 
@@ -175,7 +244,7 @@ ul > li:not(:last-child)::after {
 
 因最后一项不加逗号，可以使用 `:not()` 伪类。
 
-**注意：**这一技巧对于无障碍，特别是屏幕阅读器而言并不理想。而且复制粘贴并不会带走CSS生成的内容,需要注意。
+**注意：** 这一技巧对于无障碍，特别是屏幕阅读器而言并不理想。而且复制粘贴并不会带走CSS生成的内容，需要注意。
 
 <sup>[回目录](#目录)</sup>
 
@@ -199,7 +268,7 @@ li:nth-child(-n+3) {
 或许你已经掌握了[如何使用 `:not()`](#use-not-to-applyunapply-borders-on-navigation)这个技巧，试下这个：
 
 ```css
-/* 选择第 1 至第 3 个元素并显示出来 */
+/* 选择除前3个之外的所有项目，并显示它们 */
 li:not(:nth-child(-n+3)) {
   display: none;
 }
@@ -222,12 +291,12 @@ li:not(:nth-child(-n+3)) {
 }
 ```
 
-SVG 在所有分辨率下都可以良好缩放，并且支持所有 IE9 以后的浏览器，丢掉你的 .png, .jpg, 或 .gif-jif-whatev 文件吧。
+SVG 在所有分辨率下都可以良好缩放，并且支持所有 [IE9](https://caniuse.com/#search=svg) 以后的浏览器，丢掉你的 .png，.jpg，或 .gif-jif-whatev 文件吧。
 
 **注意：** 针对仅有图标的按钮，如果 SVG 没有加载成功的话，以下样式对无障碍有所帮助：
 
 ```css
-.no-svg .icon-only:after {
+.no-svg .icon-only::after {
   content: attr(aria-label);
 }
 ```
@@ -363,7 +432,7 @@ a[href]:not([class]) {
 
 ### 固定比例盒子
 
-要创建具有固定比例的一个盒子，所有你需要做的就是给 div 设置一个 padding：
+要创建具有固定比例的一个盒子，所有你需要做的就是给 div 的顶部或底部设置一个 padding：
 
 ```css
 .container {
@@ -382,21 +451,21 @@ a[href]:not([class]) {
 }
 ```
 
-使用20％的padding-bottom使得框等于其宽度的20％的高度。与视口宽度无关，子元素的div将保持其宽高比（100％/ 20％= 5:1）。
+使用 20％ 的 padding-bottom 使得框等于其宽度的 20％ 的高度。与视口宽度无关，子元素的 div 将保持其宽高比（100％/ 20％= 5:1）。
 
 #### [演示](http://codepen.io/AllThingsSmitty/pen/jALZvE)
 
 <sup>[回目录](#目录)</sup>
 
 
-### 为破碎图象定义样式
+### 为图裂定义样式
 
-只要一点CSS就可以美化破碎的图象：
+只要一点CSS就可以美化破损的图片：
 
 ```css
 img {  
   display: block;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: sans-serif;
   font-weight: 300;
   height: auto;
   line-height: 2;
@@ -409,20 +478,20 @@ img {
 以添加伪元素的法则来显示用户信息和URL的引用：
 
 ```css
-img:before {  
+img::before {  
   content: "We're sorry, the image below is broken :(";
   display: block;
   margin-bottom: 10px;
 }
 
-img:after {  
+img::after {  
   content: "(url: " attr(src) ")";
   display: block;
   font-size: 12px;
 }
 ```
 
-了解更多关于这类样式的技巧 [Ire Aderinokun](https://github.com/ireade/)的 [原帖](http://bitsofco.de/styling-broken-images/).
+了解更多关于这类样式的技巧 [Ire Aderinokun](https://github.com/ireade/) 的 [原帖](http://bitsofco.de/styling-broken-images/).
 
 <sup>[回目录](#目录)</sup>
 
@@ -473,7 +542,7 @@ video[autoplay]:not([muted]) {
 <sup>[回目录](#目录)</sup>
 
 
-### 使用选择器`:root`来控制字体弹性
+### 使用选择器`:root`灵活控制字体大小
 
 在响应式布局中，字体大小应需要根据不同的视口进行调整。你可以计算字体大小根据视口高度的字体大小和宽度，这时需要用到`:root`:
 
@@ -498,7 +567,7 @@ body {
 
 ### 为更好的移动体验，为表单元素设置字体大小
 
-当触发`<select>`的下拉列表时，为了避免表单元素在移动浏览器（IOS Safari 等等）上的缩放，加上`font-size`：
+当触发`<select>`的下拉列表时，为了避免表单元素在移动浏览器（iOS Safari 和其它）上的缩放，加上`font-size`：
 
 ```css
 input[type="text"],
@@ -510,6 +579,35 @@ textarea {
 ```
 
 :dancer:
+
+<sup>[回目录](#目录)</sup>
+
+
+### 使用指针事件來控制鼠标事件
+
+[指针事件](https://developer.mozilla.org/en-US/docs/Web/CSS/pointer-events)允許您指定鼠标如何与其触摸的元素进行交互。 要禁用按钮上的默认指针事件，例如：
+
+```css
+.button-disabled {
+  opacity: .5;
+  pointer-events: none;
+}
+```
+
+就这么简单。
+
+<sup>[回目录](#目录)</sup>
+
+
+### 在用作间距的换行符上设置`display: none`
+
+正如[Harry Roberts指出](https://twitter.com/csswizardry/status/1170835532584235008)，这有助于防止CMS用户使用额外的换行符
+
+```css
+br + br {
+  display: none;
+}
+```
 
 <sup>[回目录](#目录)</sup>
 
